@@ -128,27 +128,221 @@ public class Customer
         
 		return id;
 	}
-
-
-
-
 	Scanner keyboard = new Scanner(System.in);
-
+	
+	DemoDB d = new DemoDB();
+	public void update_profile(String id1)
+	{
+		//display previous details
+		int choice;
+		System.out.println("Enter the field you want to update from the following menu:");
+		System.out.println("1. Name");
+		System.out.println("2. Email-ID");
+		System.out.println("3. Password");
+		System.out.println("4. Phone no.");
+		System.out.println("5. Bank Details");
+		DemoDB d1=new DemoDB();
+		while(true)
+		{
+			Scanner sc=new Scanner(System.in);
+			choice=sc.nextInt();
+			sc.nextLine();
+			int id=Integer.parseInt(id1);
+			String uname=d1.getName(id,"customer");
+			String uemailid=d1.getemailid(id,"customer");
+			
+			String phoneNo=d1.getphoneno(id,"customer");
+			String pwd=d1.getPassword(phoneNo,"customer");
+			String bd=d1.getbank(id,"customer");
+			int status=0;
+			if(choice>6)
+			   {
+				   status=1;
+					System.out.println("INVALID CHOICE ENTER CHOICE AGAIN!");
+			   }
+			switch(choice)
+			{
+			case 1: System.out.println("Enter name:");
+					uname=sc.nextLine();
+					this.setName(uname);
+					System.out.println("Name updated successfully");
+					break;
+			case 2:	System.out.println("Enter Email-ID:");
+					uemailid=sc.nextLine();
+					this.setEmail_id(uemailid);
+					System.out.println("Email-ID updated successfully");
+					break;
+			case 3:	System.out.println("Password:");
+					pwd=sc.nextLine();
+					int flag2=0;
+					do
+					{
+						if(checkPassword(pwd))
+							flag2=1;
+						else
+						{
+							System.out.println("Enter a valid password!!(6-15 chars, atleast 1 Numeric,atleast 1 alphabet)");
+							pwd=sc.nextLine();
+						}
+					}while(flag2==0);
+					this.setPassword(pwd);
+					System.out.println("Password updated successfully");
+					break;
+					
+			case 4:	System.out.println("Enter Phone no.:");
+					phoneNo=sc.nextLine();
+					int flag1=0;
+					do
+					{
+						if(checkPhoneNo(phoneNo))
+							flag1=1;
+						else
+						{
+							System.out.println("Enter a valid mobile no.!!(Should have 10 digits)");
+							phoneNo=sc.nextLine();
+						}
+					}while(flag1==0);
+					this.setPhone_no(phoneNo);
+					System.out.println("Phone Number updated successfully");
+					break;
+					
+			case 5:	System.out.println("Enter Bank Details");
+			        bd = sc.nextLine();
+					this.setBank_details(bd);
+					System.out.println("Bank details updated successfully");
+					break;
+			}
+		   
+			if(status == 0)
+			{
+				System.out.println("Do you want to update anything else?[YES/NO]");
+					String r1 = sc.nextLine();
+					String r=r1.toLowerCase();
+					if(r.equals("yes"))
+					{	
+						d.updatecustomer(id,uname,uemailid,pwd,phoneNo,bd);
+						System.out.println("Enter the field you want to update from the following menu:");
+						System.out.println("1. Name");
+						System.out.println("2. Email-ID");
+						System.out.println("3. Password");
+						System.out.println("4. Phone no.");
+						System.out.println("5. Bank Details");
+						System.out.println("6. Submit");
+					}
+					else
+					{
+						d.updatecustomer(id,uname,uemailid,pwd,phoneNo,bd);
+						System.out.println("Your profile has been updated");
+						break;
+					}	
+			}
+			
+			//sc.close();
+		}
+		//display new details
+	}
+    
+	public void buygoods(String id)
+    {
+		Customer c1=new Customer();
+	    Wholesaler t1=new Wholesaler();
+		DemoDB d1 = new DemoDB();
+    	System.out.println("what do you want to buy?");
+    	String good1 = keyboard.nextLine();
+    	String good = good1.toLowerCase();
+    	String price1 = d1.price_details(good);
+    	String tot_quant=d1.quantity_details(good);
+    	double price = Double.parseDouble(price1);
+    	System.out.println("Price of given commodity:"+price);
+    	System.out.println("Enter the quantity you want to buy:");
+    	double quant=Double.parseDouble(tot_quant);
+    	double quant1=keyboard.nextDouble();
+    	keyboard.nextLine();
+    	
+    	while(quant1>quant)
+    	{
+    		System.out.println("Commdodity of that amount is not available\nEnter Quantity again..");
+    		quant1=keyboard.nextDouble();
+    		keyboard.nextLine();
+    	}
+    	
+    	System.out.println("So Customer's total amount will be:"+ price*quant1);
+	    double customer_price=price*quant1;
+	    double trader_price=price*quant1;
+	    
+	    
+	    while(true)
+	    {
+	    	 System.out.println("Customer:Do you want to bargain more?[yes/no]");
+	    	 String s = keyboard.nextLine();
+	    	 s=s.toLowerCase();
+	    	 
+	    	 if(s.equals("yes"))
+	    	 {
+	    		 customer_price = c1.bargain(trader_price);
+			     trader_price = t1.bargain(customer_price);;
+	    	 }
+	    	 else
+	    		 break;
+	    }
+	    
+	    System.out.println("Do you want to buy at this price?[yes/no]");
+	    String res = keyboard.nextLine();
+	    String result=res.toLowerCase();
+	    
+	    String tprice = String.valueOf(trader_price);
+	    String tquant = String.valueOf(quant1);
+	    
+	    if(result.equals("yes"))
+	    {
+	    	String tquant1=d.quantity_details(good);
+			double init=Double.parseDouble(tquant1)-quant1;
+			String s=String.valueOf(init);
+			d.updategoods(good,s);
+			
+	    	System.out.println("Confirmed final price for Customer="+trader_price);
+	    	Receipt r = new Receipt();
+	    	r.generatebill("customer", id, tprice, tquant);
+	    }
+	    else
+	    	System.out.println("Sorry! Customer doesn't want to buy!!");
+    }
+    
 	public double bargain(double trader_price)
     {
-    	System.out.println("Do you want to bargain?[Y/N]");
-    	char c=keyboard.next().charAt(0);
-    	if(c=='N')
-    	{
-    		System.out.println("Confirmed final price="+trader_price);
-    		return trader_price;
-    	}
-    	else
-    	{
     		System.out.println("Enter Customer's price:");
     		double customer_price = keyboard.nextDouble();
+    		keyboard.nextLine();
     		return customer_price;
-    	}
     }
-	
+    
+	public void listofactions(String id)
+    {
+		int flag=1;
+		while(flag==1)
+		{
+	    	System.out.println("Available actions for customer are given below:\n1.Update Profile\n2.Buy Goods\n");
+	    	System.out.println("Enter your choice:");
+	    	int x=keyboard.nextInt();
+	    	keyboard.nextLine();
+	    	switch(x)
+	    	{
+	    	case 1:
+	    		update_profile(id);
+	    		break;
+	    	case 2:
+	    		buygoods(id);
+	    		break;
+	    	}
+	    	System.out.println("Do you want to logout?[yes/no]");
+	    	String res1=keyboard.nextLine();
+	    	String res=res1.toLowerCase();
+	    	if(res.equals("yes"))
+	    	{
+	    		System.out.println("You are successfully Logout from the System!!");
+	    		flag=0;
+	    	}
+	    		
+    	}
+    }	
 }

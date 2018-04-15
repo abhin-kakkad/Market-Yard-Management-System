@@ -2,7 +2,13 @@ import java.util.*;
 
 public class Portal {
 
+		private static String M_Id="999";
+		private static String M_type="Mandi-Admin";
+		private static String M_pwd="sabkamaalik";
+	
 		private static String id;
+		private static String id1;
+		private static int flag=0;
 		private static String type;	//current user id and type
 		
 		public static String getId() {
@@ -20,23 +26,42 @@ public class Portal {
 		
 		public static void authenticate(String type)
 		{
-			Scanner sc=new Scanner(System.in);
-			System.out.println("Enter the Phone No.");
-			String usr=sc.nextLine();
-			
-			DemoDB d = new DemoDB();
-			String pwd=d.getPassword(usr,type);
-			//System.out.println(pwd);
-			
-			System.out.println("Enter the password");
-			String p=sc.nextLine();
-			
-			if(p.equals(pwd))
-				System.out.println("Mandi ma aapnu swagat che!!");
-			else
-				System.out.println("The username or Password is invalid!");
-			//call authenticate
-			sc.close();
+			if(type.equals(M_type)) {
+				Scanner sc=new Scanner(System.in);
+				System.out.println("Enter ID");
+				String usr=sc.nextLine();
+				System.out.println("Enter Password");
+				String pwd=sc.nextLine();
+				
+				if(usr.equals(M_Id) && pwd.equals(M_pwd))
+					System.out.println("You have universal access to the Mandi");
+				else
+					System.out.println("Please check your credentials");
+			}
+			else {
+				Scanner sc=new Scanner(System.in);
+				System.out.println("Enter the Phone No.");
+				String usr=sc.nextLine();
+				
+				DemoDB d = new DemoDB();
+				String pwd=d.getPassword(usr,type);
+				id1=d.getID(usr,type);
+				//System.out.println(id);
+				
+				System.out.println("Enter the password");
+				String p=sc.nextLine();
+				
+				if(p.equals(pwd))
+				{
+					System.out.println("Mandi ma aapnu swagat che!!");
+					flag=0;
+				}
+				else
+				{
+					System.out.println("The username or Password is invalid!");
+					flag=1;
+				}
+			}
 		}
 		
 		public static void signUp(String type)
@@ -79,9 +104,13 @@ public class Portal {
 		Portal.setId("null");
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.println("Enter type: (Farmer/Wholesaler/Retailer/Customer)");
-		String type=sc.nextLine();
-
+		System.out.println("Enter type: (Farmer/Wholesaler/Retailer/Customer/Mandi-Admin)");
+		String type1=sc.nextLine();
+		String type = type1.toLowerCase();
+		flag=1;
+		
+      while(flag==1)
+      {
 		System.out.println("Enter your choice:");
 		System.out.println("1. Signup");
 		System.out.println("2. Login");
@@ -95,17 +124,36 @@ public class Portal {
 				break;
 				
 		}
-		if(type == "Customer")
-		{
-			System.out.println("What do you want to buy?");
-			String good=sc.nextLine();
-			double price=Portal.price_details(good); 
-			System.out.println("Do you want to by at this price?");
-			char choice = sc.nextch
-
-		}
-			
-		sc.close();
+		sc.nextLine();
 		
-	}
+		if(flag!=1)
+		{
+			if(type.equals("customer"))
+			{
+				Customer c = new Customer();
+				c.listofactions(id1);
+			}
+			
+			if(type.equals("farmer"))
+			{
+				Farmer f = new Farmer();
+				f.listofactions(id1);
+			}
+			
+			if(type.equals("wholesaler"))
+			{
+				Wholesaler w = new Wholesaler();
+				w.listofactions(id1);
+			}
+			
+			if(type.equals("retailer"))
+			{
+				Retailer r = new Retailer();
+				r.listofactions(id1);
+			}
+		}
+      }
+	 sc.close();
+
+  }
 }
